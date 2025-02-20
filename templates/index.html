@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movie Recommender System</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<style>
+    .error-message {
+        color: red;
+        margin: 10px 0;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Movie Recommender</h1>
+<form method="POST">
+<label for="movie">Search for a movie:</label>
+<input type="text" id="movie-search" name="movie" placeholder="Type to search..." autocomplete="off">
+<div id="movie-list" class="hidden">
+ {% for movie in movie_list %}
+<div class="movie-item">{{ movie }}</div>
+ {% endfor %}
+</div>
+<button type="submit">Show Recommendation</button>
+</form>
+
+{% if error_message %}
+<div class="error-message">{{ error_message }}</div>
+{% endif %}
+
+{% if recommended_movie_names %}
+<h2>Recommended Movies:</h2>
+<div class="recommendations">
+ {% for i in range(recommended_movie_names|length) %}
+<div class="movie">
+<img src="{{ recommended_movie_posters[i] }}" alt="{{ recommended_movie_names[i] }}">
+<p>{{ recommended_movie_names[i] }}</p>
+</div>
+ {% endfor %}
+</div>
+{% endif %}
+</div>
+<script>
+// O script JavaScript permanece o mesmo...
+const movieSearch = document.getElementById('movie-search');
+const movieList = document.getElementById('movie-list');
+movieSearch.addEventListener('focus', () => {
+    movieList.classList.remove('hidden');
+});
+movieSearch.addEventListener('blur', () => {
+    // Ocultar a lista após um pequeno atraso para permitir a seleção de um filme
+    setTimeout(() => {
+        movieList.classList.add('hidden');
+    }, 200);
+});
+// Função para filtrar filmes enquanto o usuário digita
+movieSearch.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const allMovies = Array.from(movieList.getElementsByClassName('movie-item'));
+    allMovies.forEach(movie => {
+        const movieName = movie.textContent.toLowerCase();
+        if (movieName.includes(query)) {
+            movie.style.display = 'block';
+        } else {
+            movie.style.display = 'none';
+        }
+    });
+});
+// Função para selecionar um filme ao clicar
+movieList.addEventListener('click', function(event) {
+    if (event.target.classList.contains('movie-item')) {
+        movieSearch.value = event.target.textContent;
+        movieList.classList.add('hidden'); // Ocultar a lista após a seleção
+    }
+});
+</script>
+</body>
+</html>
